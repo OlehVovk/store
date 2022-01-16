@@ -8,6 +8,7 @@ defmodule Store.Repo.Migrations.CreateProducts do
 
       timestamps()
     end
+
     create table("clients") do
       add :name, :string, size: 64
       add :city, :string, size: 24
@@ -18,6 +19,7 @@ defmodule Store.Repo.Migrations.CreateProducts do
 
       timestamps()
     end
+
     create table("orders") do
       add :client_id, references("clients", on_delete: :restrict, on_update: :update_all)
       add :orderdata, :date
@@ -28,14 +30,15 @@ defmodule Store.Repo.Migrations.CreateProducts do
 
       timestamps()
     end
+
     create table("products") do
       add :maker_id, references("makers", on_delete: :restrict, on_update: :update_all)
       add :name, :string, size: 32
       add :price, :decimal
 
-
       timestamps()
     end
+
     create table("order_basket") do
       add :order_id, references("orders", on_delete: :delete_all, on_update: :update_all)
       add :product_id, references("products", on_delete: :delete_all, on_update: :update_all)
@@ -44,7 +47,6 @@ defmodule Store.Repo.Migrations.CreateProducts do
 
       timestamps()
     end
-
 
     create index("products", [:name])
     create index("products", [:maker_id])
