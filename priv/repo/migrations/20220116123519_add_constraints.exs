@@ -14,7 +14,7 @@ defmodule Store.Repo.Migrations.AddConstraints do
     alter table("clients") do
       modify :name, :string, size: 64, null: false
       modify :city, :string, size: 24, null: false
-      modify :phone, :string, size: 16, null: false
+      modify :phone, :string, size: 13, null: false
     end
 
     # -------------------------------------------------------
@@ -28,22 +28,20 @@ defmodule Store.Repo.Migrations.AddConstraints do
       modify :shipcost, :decimal, null: false
     end
 
+    create unique_index("orders", [:order_number])
     # -------------------------------------------------------
-    # changing primary key in "products"
-    drop(constraint("order_basket", "order_basket_product_id_fkey"))
-    drop(constraint("products", "products_pkey"))
+    # products
 
     alter table("products") do
-      modify :name, :string, size: 32, primary_key: true
-      modify :price, :decimal, primary_key: true
+      modify :name, :string, size: 32, null: false
+      modify :price, :decimal, null: false
     end
 
-    create unique_index("products", [:id])
+    create unique_index("products", [:name, :price])
     # -------------------------------------------------------
     # order_basket
     alter table("order_basket") do
       modify :quantity, :integer, null: false
-      modify :product_id, references("products", on_delete: :delete_all, on_update: :update_all)
     end
 
     create unique_index("order_basket", [:order_id, :product_id])
@@ -51,24 +49,20 @@ defmodule Store.Repo.Migrations.AddConstraints do
   end
 
   def down do
-    # changing primary key in "products"
-    drop(constraint("order_basket", "order_basket_product_id_fkey"))
-    drop index("products", [:id])
-    drop(constraint("products", "products_pkey"))
-
-    alter table("products") do
-      modify :id, :integer, primary_key: true
-      modify :name, :string, size: 32, null: true
-      modify :price, :decimal, null: true
-    end
-
-    # -------------------------------------------------------
     # order_basket
     drop index("order_basket", [:order_id, :product_id])
 
     alter table("order_basket") do
       modify :quantity, :integer, null: true
-      modify :product_id, references("products", on_delete: :delete_all, on_update: :update_all)
+    end
+
+    # -------------------------------------------------------
+    # products
+    drop index("products", [:name, :price])
+
+    alter table("products") do
+      modify :name, :string, size: 32, null: true
+      modify :price, :decimal, null: true
     end
 
     # -------------------------------------------------------
